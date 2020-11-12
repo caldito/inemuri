@@ -1,0 +1,11 @@
+{
+  "background_color": "#FFF",
+  "display": "standalone",
+  "name": "InemuriApp",
+  "short_name": "InemuriApp",
+  "version": "es.uc3m.inemuri",
+  "description": "Una aplicación para dormir en el transporte público y no saltarse la parada.",
+  "author": "AAA BBB",
+  "icons": [],
+  "start_url": "index.html"
+}
