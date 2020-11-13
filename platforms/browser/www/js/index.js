@@ -3,27 +3,32 @@ document.addEventListener('deviceready', onDeviceReady);
 // Global Variables 
 let marker;
 let distance;
+let positionCircle;
+let map; // this is defined as let instead of const to have it as global and initialize the variable on the onDeviceReady function
 
-//
+
 function onDeviceReady(){
-	//console.log(navigator.vibrate);
-	//console.log(navigator.geolocation);
-	navigator.geolocation;
-
-
-	const watchId = navigator.geolocation.watchPosition(geolocationSuccess,geolocationError);
-	const map = L.map('the_map').setView([51.505, -0.09], 13);
+	// create map
+	map = L.map('the_map').setView([51.505, -0.09], 13);
 	L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
-			maxZoom: 18
+		attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+		maxZoom: 18
 	}).addTo(map);
+
+	// Check location
+	const watchId = navigator.geolocation.watchPosition(geolocationSuccess,geolocationError);
+	//setTimeout (function run(){
+	//	navigator.geolocation.watchPosition(geolocationSuccess,geolocationError),
+	//	setTimeout(run,5000);
+	//},100)
+
+	// Add destination marker on click
 	map.on('click', function(e){
 		if (marker != null){
 			marker.remove();
 		}
 		marker = new L.marker(e.latlng).addTo(map);
-		//console.log(marker._latlng)
-		console.log(getDistanceFromLatLon(marker._latlng.lat, marker._latlng.lng, 40.416951, -3.703483))
+		//console.log(getDistanceFromLatLon(marker._latlng.lat, marker._latlng.lng, 40.416951, -3.703483))
 	  }
 	);
 }
@@ -48,12 +53,22 @@ function deg2rad(deg) {
 }
 
 function geolocationSuccess(position){
-	console.log(position);
+	// Update position circle
+	if (positionCircle != null){
+		positionCircle.remove();
+	}
+	var positionObject =  L.latLng(position.coords.latitude, position.coords.longitude);
+	positionCircle = L.circle(positionObject,10).addTo(map);
+
+	//console.log(position);
+
+	// Check if the marker is close to the user. In that case then vibrate.
 	if (marker != null){
 		distance = getDistanceFromLatLon(marker._latlng.lat, marker._latlng.lng, position.coords.latitude, position.coords.longitude);
-		console.log(distance);
+		//console.log(distance);
 		if (distance < 100){
 			console.log("Wake up!");
+			console.log(navigator.vibrate([1500, 1000, 1500]));
 		}
 	}
 }
